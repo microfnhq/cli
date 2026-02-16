@@ -1,17 +1,33 @@
 {
-	"name": "@microfn/cli",
+	"name": "microfn",
 	"version": "0.1.0",
 	"description": "CLI client for MicroFn APIs",
 	"license": "AGPL-3.0-only",
 	"type": "module",
 	"bin": {
-		"microfn": "dist/index.js"
+		"microfn": "dist/index.js",
+		"mfn": "dist/index.js"
 	},
+	"files": [
+		"dist"
+	],
+	"keywords": [
+		"microfn",
+		"cli",
+		"serverless",
+		"functions"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/microfnhq/cli"
+	},
+	"homepage": "https://microfn.dev",
 	"scripts": {
 		"build": "tsc",
 		"dev": "bun run src/index.ts",
 		"type-check": "tsc --noEmit",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"prepublishOnly": "bun run build"
 	},
 	"dependencies": {
 		"commander": "^14.0.3",
@@ -20,6 +36,9 @@
 	"devDependencies": {
 		"@types/node": "^25.2.3",
 		"typescript": "^5.8.3"
+	},
+	"engines": {
+		"node": ">=18"
 	},
 	"packageManager": "bun@1.2.22"
 }
