@@ -52,6 +52,13 @@ function parseJsonInput(raw: string): unknown {
 	return JSON.parse(raw);
 }
 
+function readCodeInput(raw: string): string {
+	if (raw === "-") {
+		return readFileSync(0, "utf8");
+	}
+	return readFileSync(raw, "utf8");
+}
+
 function outputJson(value: unknown): void {
 	console.log(JSON.stringify(value, null, 2));
 }
@@ -121,6 +128,13 @@ function formatWorkspacesText(workspaces: Workspace[]): string {
 	);
 
 	return [header, ...lines].join("\n");
+}
+
+function formatCreatedWorkspaceText(workspace: Workspace): string {
+	const owner = workspace.username || workspace.Account?.username || "unknown-user";
+	const fullName = `${owner}/${workspace.name}`;
+	const status = workspace.latestDeployment?.status || "pending";
+	return `Created function: ${fullName}\nDeployment: ${status}`;
 }
 
 function formatFunctionDetailsText(
@@ -290,6 +304,23 @@ function createProgram(): Command {
 		});
 
 	program
+		.command("create")
+		.description("Create a new function from a code file.")
+		.argument("<name>", "Function name")
+		.argument("<file>", "Code file path or '-' to read stdin")
+		.action(async (name: string, file: string) => {
+			const options = program.opts<GlobalOptions>();
+			const client = createClient(options);
+			const code = readCodeInput(file);
+			const workspace = await client.createWorkspace({ name, code });
+			outputWithMode(
+				options.output,
+				workspace,
+				formatCreatedWorkspaceText,
+			);
+		});
+
+	program
 		.command("info")
 		.description("Show function details and metadata.")
 		.argument("<username/function>", "Function identifier")
@@ -317,6 +348,25 @@ function createProgram(): Command {
 				options.output,
 				await client.getFunctionCode(username, functionName),
 				formatFunctionCodeText,
+			);
+		});
+
+	program
+		.command("push")
+		.alias("update-code")
+		.description("Push code to a function.")
+		.argument("<username/function>", "Function identifier")
+		.argument("<file>", "Code file path or '-' to read stdin")
+		.action(async (rawIdentifier: string, file: string) => {
+			const options = program.opts<GlobalOptions>();
+			const client = createClient(options);
+			const { username, functionName } = parseFunctionIdentifier(rawIdentifier);
+			const code = readCodeInput(file);
+			const result = await client.updateFunctionCode(username, functionName, code);
+			outputWithMode(
+				options.output,
+				result,
+				(r) => r.message || "Code pushed successfully",
 			);
 		});
 
@@ -353,8 +403,12 @@ function createProgram(): Command {
 		`
 Examples:
   microfn list
+  microfn create my-function ./src/main.ts
+  cat code.ts | microfn create my-function -
   microfn info yourname/my-function
   microfn code yourname/my-function
+  microfn push yourname/my-function ./src/main.ts
+  cat code.ts | microfn push yourname/my-function -
   microfn execute yourname/my-function '{"name":"world"}'
   microfn --output json info yourname/my-function
   microfn execute yourname/my-function - <<'EOF'
