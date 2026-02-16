@@ -1,0 +1,25 @@
+{
+	"name": "@microfn/cli",
+	"version": "0.1.0",
+	"description": "CLI client for MicroFn APIs",
+	"license": "AGPL-3.0-only",
+	"type": "module",
+	"bin": {
+		"microfn": "dist/index.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "bun run src/index.ts",
+		"type-check": "tsc --noEmit",
+		"start": "bun run dist/index.js"
+	},
+	"dependencies": {
+		"commander": "^14.0.3",
+		"jose": "^6.0.11"
+	},
+	"devDependencies": {
+		"@types/node": "^25.2.3",
+		"typescript": "^5.8.3"
+	},
+	"packageManager": "bun@1.2.22"
+}
