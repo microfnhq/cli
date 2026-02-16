@@ -1,0 +1,1 @@
+- Always run `mise build` after each change

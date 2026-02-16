@@ -97,7 +97,10 @@ function formatWorkspacesText(workspaces: Workspace[]): string {
 	const cols = {
 		name: Math.max("NAME".length, ...rows.map((r) => r.name.length)),
 		status: Math.max("STATUS".length, ...rows.map((r) => r.status.length)),
-		visibility: Math.max("VISIBILITY".length, ...rows.map((r) => r.visibility.length)),
+		visibility: Math.max(
+			"VISIBILITY".length,
+			...rows.map((r) => r.visibility.length),
+		),
 		mcp: Math.max("MCP".length, ...rows.map((r) => r.mcp.length)),
 	};
 
@@ -114,7 +117,7 @@ function formatWorkspacesText(workspaces: Workspace[]): string {
 			r.status.padEnd(cols.status),
 			r.visibility.padEnd(cols.visibility),
 			r.mcp.padEnd(cols.mcp),
-		].join("  ")
+		].join("  "),
 	);
 
 	return [header, ...lines].join("\n");
@@ -184,7 +187,10 @@ function formatFunctionCodeText(functionCode: FunctionCode): string {
 	return functionCode.code || "";
 }
 
-function formatExecuteResultText(executeResult: ExecuteFunctionResult, includeLogs = false): string {
+function formatExecuteResultText(
+	executeResult: ExecuteFunctionResult,
+	includeLogs = false,
+): string {
 	const payload = executeResult.result;
 
 	if (!isRecord(payload)) {
@@ -320,18 +326,27 @@ function createProgram(): Command {
 		.argument("<username/function>", "Function identifier")
 		.argument("[json]", "JSON payload or '-' to read stdin", "{}")
 		.option("--include-logs", "Include execution logs in output", false)
-		.action(async (rawIdentifier: string, payload: string, cmdOpts: { includeLogs: boolean }) => {
-			const options = program.opts<GlobalOptions>();
-			const client = createClient(options);
-			const { username, functionName } = parseFunctionIdentifier(rawIdentifier);
-			const inputData = parseJsonInput(payload);
-			const result = await client.executeFunction(username, functionName, inputData);
-			outputWithMode(
-				options.output,
-				result,
-				(r) => formatExecuteResultText(r, cmdOpts.includeLogs),
-			);
-		});
+		.action(
+			async (
+				rawIdentifier: string,
+				payload: string,
+				cmdOpts: { includeLogs: boolean },
+			) => {
+				const options = program.opts<GlobalOptions>();
+				const client = createClient(options);
+				const { username, functionName } =
+					parseFunctionIdentifier(rawIdentifier);
+				const inputData = parseJsonInput(payload);
+				const result = await client.executeFunction(
+					username,
+					functionName,
+					inputData,
+				);
+				outputWithMode(options.output, result, (r) =>
+					formatExecuteResultText(r, cmdOpts.includeLogs),
+				);
+			},
+		);
 
 	program.addHelpText(
 		"after",

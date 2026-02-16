@@ -258,7 +258,10 @@ export class MicroFnApiClient {
 
 				if (currentTime >= tokenExp) {
 					const expiredAt = new Date(tokenExp * 1000).toISOString();
-					this.logger.error("[MicroFnApiClient] ID token expired at:", expiredAt);
+					this.logger.error(
+						"[MicroFnApiClient] ID token expired at:",
+						expiredAt,
+					);
 					throw new Error(
 						`ID token expired at ${expiredAt}. Please re-authenticate.`,
 					);
@@ -267,7 +270,10 @@ export class MicroFnApiClient {
 				if (error instanceof Error && error.message.includes("expired")) {
 					throw error;
 				}
-				this.logger.error("[MicroFnApiClient] Failed to validate token:", error);
+				this.logger.error(
+					"[MicroFnApiClient] Failed to validate token:",
+					error,
+				);
 				throw new Error("Invalid ID token");
 			}
 		} else {
@@ -657,7 +663,10 @@ export class MicroFnApiClient {
 	): Promise<ExecuteFunctionResult> {
 		const url = `${this.baseUrl}/v1/functions/${username}/${functionName}/run`;
 		this.logger.log("[MicroFnApiClient] POST", url);
-		this.logger.log("[MicroFnApiClient] Input data:", JSON.stringify(inputData));
+		this.logger.log(
+			"[MicroFnApiClient] Input data:",
+			JSON.stringify(inputData),
+		);
 
 		const res = await this.fetchWithAbort(url, {
 			method: "POST",
