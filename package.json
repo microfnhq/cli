@@ -4,6 +4,23 @@
 	"description": "CLI client for MicroFn APIs",
 	"license": "AGPL-3.0-only",
 	"type": "module",
+	"main": "dist/lib.js",
+	"types": "dist/lib.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/lib.d.ts",
+			"import": "./dist/lib.js"
+		},
+		"./client": {
+			"types": "./dist/client.d.ts",
+			"import": "./dist/client.js"
+		},
+		"./microfnApiClient": {
+			"types": "./dist/microfnApiClient.d.ts",
+			"import": "./dist/microfnApiClient.js"
+		},
+		"./dist/*": "./dist/*"
+	},
 	"bin": {
 		"microfn": "dist/index.js",
 		"mfn": "dist/index.js"
